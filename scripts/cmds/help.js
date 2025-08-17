@@ -2,7 +2,7 @@ module.exports = {
   config: {
     name: "help",
     aliases: ["menu", "commands"],
-    version: "3.2",
+    version: "3.1",
     author: "eran_hossain",
     shortDescription: "Show all available commands",
     longDescription: "Display a categorized list of all available commands.",
@@ -31,7 +31,6 @@ module.exports = {
         .join(" ");
     };
 
-    // Categorize commands
     for (const [, cmd] of allCommands) {
       const rawCat = cmd.config.category || "others";
       const cat = cleanCategoryName(rawCat);
@@ -39,17 +38,26 @@ module.exports = {
       categories[cat].push(cmd.config.name);
     }
 
-    // If user requested a specific command
     if (args[0]) {
       const query = args[0].toLowerCase();
       const cmd = allCommands.get(query) || [...allCommands.values()].find(c => (c.config.aliases || []).includes(query));
       if (!cmd) return message.reply(`❌ Command "${query}" not found.`);
 
-      const { name, version, author, guide, category, shortDescription, longDescription, aliases } = cmd.config;
+      const {
+        name,
+        version,
+        author,
+        guide,
+        category,
+        shortDescription,
+        longDescription,
+        aliases
+      } = cmd.config;
 
-      const desc = typeof longDescription === "string"
-        ? longDescription
-        : (longDescription?.en || shortDescription || shortDescription?.en || "No description available");
+      const desc =
+        (typeof longDescription === "string")
+          ? longDescription
+          : (longDescription?.en || (typeof shortDescription === "string" ? shortDescription : (shortDescription?.en || "No description")));
 
       return message.reply(
         `✨ Command Info\n\n` +
@@ -57,13 +65,13 @@ module.exports = {
         `Category: ${category || "Unknown"}\n` +
         `Description: ${desc}\n` +
         `Aliases: ${aliases?.length ? aliases.join(", ") : "None"}\n` +
-        `Usage: ${typeof guide === "string" ? guide.replace(/{pn}/g, prefix) : `${prefix}${name}`}\n` +
+        `Usage: ${typeof guide === "string" ? guide.replace(/{pn}/g, prefix) : prefix + name}\n` +
         `Author: ${author || "Unknown"}\n` +
         `Version: ${version || "1.0"}`
       );
     }
 
-    // General help message
+    // Final message layout
     let msg = "";
     const sortedCats = Object.keys(categories).sort();
     let total = 0;
@@ -71,17 +79,17 @@ module.exports = {
     for (const cat of sortedCats) {
       const cmds = categories[cat]
         .sort((a, b) => a.localeCompare(b))
-        .map(c => `🖥️ ${c}`)
+        .map(c => `🖥️${c}`)
         .join(",\n│ ");
       total += categories[cat].length;
-      msg += `──────────────  ${formatCategoryTitle(cat)}  ──────────────\n`;
+      msg += `╭─────^_^ ${formatCategoryTitle(cat)} 』\n`;
       msg += `│ ${cmds}\n`;
-      msg += `╰───────────────────────────────\n\n`;
+      msg += `╰────────────────°\n\n`;
     }
 
-    msg += `◎ Eran_hossain • https://www.facebook.com/profile.php?id=100083613360627\n`;
+    msg += `◎ Eran_hossain ggs_Ai\n`;
     msg += `Total Commands » ${total}\n`;
-    msg += `Use "${prefix}help [command]" for details`;
+    msg += `Use help cmd (cmd name)`;
 
     return message.reply(msg.trim());
   }
